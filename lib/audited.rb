@@ -47,7 +47,9 @@ module Audited
   @store_synthesized_enums = false
 end
 
-require "audited/auditor"
+require 'audited/auditor'
+require 'audited/audit'
+require 'audited/audit_associate'
 
 ActiveSupport.on_load :active_record do
   require "audited/audit"

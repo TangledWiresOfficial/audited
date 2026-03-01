@@ -102,7 +102,8 @@ module Audited
       end
 
       def has_associated_audits
-        has_many :associated_audits, as: :associated, class_name: Audited.audit_class.name
+        has_many :audit_associates, as: :associated, class_name: Audited::AuditAssociate.name
+        has_many :associated_audits, through: :audit_associates, source: :audit, class_name: Audited.audit_class.name
       end
 
       def update_audited_options(new_options)
@@ -376,13 +377,11 @@ module Audited
         self.audit_comment = nil
 
         if auditing_enabled
-          attrs[:associated] = send(audit_associated_with) unless audit_associated_with.nil?
-
-          run_callbacks(:audit) {
+          run_callbacks(:audit) do
             audit = audits.create(attrs)
-            combine_audits_if_needed if attrs[:action] != "create"
+            audit.audit_associates << collect_audit_associated_with unless audit_associated_with.nil?
             audit
-          }
+          end
         end
       end
 
@@ -448,6 +447,12 @@ module Audited
         attributes = {}
         audits.each { |audit| attributes.merge!(audit.new_attributes) }
         attributes
+      end
+
+      def collect_audit_associated_with
+        Array(audit_associated_with).map do |associated|
+          Audited::AuditAssociate.new(associated: send(associated))
+        end
       end
     end
 

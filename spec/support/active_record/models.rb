@@ -141,6 +141,11 @@ module Models
     class Company::STICompany < Company
     end
 
+    class Country < ::ActiveRecord::Base
+      has_associated_audits
+      has_many :companies, class_name: "OwnedCompany", dependent: :destroy
+    end
+
     class Owner < ::ActiveRecord::Base
       self.table_name = "users"
       audited
@@ -156,10 +161,11 @@ module Models
     end
 
     class OwnedCompany < ::ActiveRecord::Base
-      self.table_name = "companies"
+      self.table_name = 'companies'
       belongs_to :owner, class_name: "Owner", touch: true
-      attr_accessible :name, :owner if respond_to?(:attr_accessible) # declare attr_accessible before calling aaa
-      audited associated_with: :owner
+      belongs_to :country
+      attr_accessible :name, :owner, :country if respond_to?(:attr_accessible) # declare attr_accessible before calling aaa
+      audited associated_with: [:country, :owner]
     end
 
     class OwnedCompany::STICompany < OwnedCompany

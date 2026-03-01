@@ -50,10 +50,15 @@ ActiveRecord::Schema.define do
     t.column :phone_numbers, :string
   end
 
+  create_table :countries do |t|
+    t.column :name, :string
+  end
+
   create_table :companies do |t|
     t.column :name, :string
     t.column :owner_id, :integer
     t.column :type, :string
+    t.column :country_id, :integer
   end
 
   create_table :authors do |t|
@@ -68,8 +73,6 @@ ActiveRecord::Schema.define do
   create_table :audits do |t|
     t.column :auditable_id, :integer
     t.column :auditable_type, :string
-    t.column :associated_id, :integer
-    t.column :associated_type, :string
     t.column :user_id, :integer
     t.column :user_type, :string
     t.column :username, :string
@@ -82,9 +85,17 @@ ActiveRecord::Schema.define do
     t.column :created_at, :datetime
   end
 
-  add_index :audits, [:auditable_id, :auditable_type], name: "auditable_index"
-  add_index :audits, [:associated_id, :associated_type], name: "associated_index"
-  add_index :audits, [:user_id, :user_type], name: "user_index"
+  add_index :audits, [:auditable_id, :auditable_type], name: 'auditable_index'
+  add_index :audits, [:user_id, :user_type], name: 'user_index'
   add_index :audits, :request_uuid
   add_index :audits, :created_at
+
+  create_table :audited_audit_associates, :force => true do |t|
+    t.column :audit_id, :integer
+    t.column :associated_id, :integer
+    t.column :associated_type, :string
+  end
+
+  add_index :audited_audit_associates, :audit_id, :name => 'index_audited_audit_associates_on_audit_id'
+  add_index :audited_audit_associates, [:associated_type, :associated_id], :name => 'index_audited_audit_associates_on_associated'
 end
