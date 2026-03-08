@@ -197,8 +197,10 @@ module Audited
 
       # Returns a list combined of record audits and associated audits.
       def own_and_associated_audits
-        Audited.audit_class.unscoped.where(auditable: self)
-          .or(Audited.audit_class.unscoped.where(associated: self))
+        Audited.audit_class.unscoped
+          .includes(:audit_associates)
+          .where(auditable: self)
+          .or(Audited.audit_class.unscoped.includes(:audit_associates).where(audit_associates: { associated: self }))
           .order(created_at: :desc)
       end
 
@@ -380,6 +382,7 @@ module Audited
           run_callbacks(:audit) do
             audit = audits.create(attrs)
             audit.audit_associates << collect_audit_associated_with unless audit_associated_with.nil?
+            combine_audits_if_needed if attrs[:action] != 'create'
             audit
           end
         end
