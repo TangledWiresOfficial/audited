@@ -79,7 +79,7 @@ jobs:
           - appraisal: rails80
             ruby: "3.1"
 
-          # Rails main supports Ruby 3.2+
+          # Rails main supports Ruby 3.3+
           - appraisal: rails_main
             ruby: "2.3"
           - appraisal: rails_main
@@ -94,6 +94,8 @@ jobs:
             ruby: "3.0"
           - appraisal: rails_main
             ruby: "3.1"
+          - appraisal: rails_main
+            ruby: "3.2"
 
     services:
       postgres:
