@@ -1,22 +1,17 @@
-Audited
-[![Gem Version](https://img.shields.io/gem/v/audited.svg)](http://rubygems.org/gems/audited)
-![Build Status](https://github.com/collectiveidea/audited/actions/workflows/ci.yml/badge.svg)
-[![Code Climate](https://codeclimate.com/github/collectiveidea/audited.svg)](https://codeclimate.com/github/collectiveidea/audited)
+TangledWires Audited
+[![Gem Version](https://img.shields.io/gem/v/tangledwires-audited.svg)](http://rubygems.org/gems/tangledwires-audited)
+![Build Status](https://github.com/TangledWiresOfficial/audited/actions/workflows/ci.yml/badge.svg)
 [![Ruby Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://github.com/testdouble/standard)
 =======
 
 **Audited** (previously acts_as_audited) is an ORM extension that logs all changes to your models. Audited can also record who made those changes, save comments and associate models related to the changes.
 
 
-Audited currently (5.6) works with Rails 7.2, 7.1, 7.0, 6.1, 6.0, 5.2.
-
-For Rails 5.0 & 5.1, use gem version 5.4.3
-For Rails 4, use gem version 4.x
-For Rails 3, use gem version 3.0 or see the [3.0-stable branch](https://github.com/collectiveidea/audited/tree/3.0-stable).
+Audited currently (5.6) works with Rails 8.0, 7.2, 7.1, 7.0.
 
 ## Supported Rubies
 
-Audited supports and is [tested against](https://github.com/collectiveidea/audited/actions/workflows/ci.yml) the following Ruby versions:
+Audited supports and is [tested against](https://github.com/TangledWiresOfficial/audited/actions/workflows/ci.yml) the following Ruby versions:
 
 * 2.3 (only tested on Sqlite due to testing issues with other DBs)
 * 2.4
@@ -28,18 +23,18 @@ Audited supports and is [tested against](https://github.com/collectiveidea/audit
 * 3.2
 * 3.3
 
-Audited may work just fine with a Ruby version not listed above, but we can't guarantee that it will. If you'd like to maintain a Ruby that isn't listed, please let us know with a [pull request](https://github.com/collectiveidea/audited/pulls).
+Audited may work just fine with a Ruby version not listed above, but we can't guarantee that it will.
 
 ## Supported ORMs
 
-Audited is currently ActiveRecord-only. In a previous life, Audited worked with MongoMapper. Use the [4.2-stable branch](https://github.com/collectiveidea/audited/tree/4.2-stable) if you need MongoMapper.
+Audited is currently ActiveRecord-only.
 
 ## Installation
 
 Add the gem to your Gemfile:
 
 ```ruby
-gem "audited"
+gem "tangledwires-audited"
 ```
 
 And if you're using ```require: false``` you must add initializers like this:
@@ -58,7 +53,7 @@ $ rails generate audited:install
 $ rake db:migrate
 ```
 
-By default changes are stored in YAML format. If you're using PostgreSQL, then you can use `rails generate audited:install --audited-changes-column-type jsonb` (or `json` for MySQL 5.7+ and Rails 5+) to store audit changes natively with database JSON column types.
+By default, changes are stored in YAML format. If you're using PostgreSQL, then you can use `rails generate audited:install --audited-changes-column-type jsonb` (or `json` for MySQL 5.7+ and Rails 5+) to store audit changes natively with database JSON column types.
 
 If you're using something other than integer primary keys (e.g. UUID) for your User model, then you can use `rails generate audited:install --audited-user-id-column-type uuid` to customize the `audits` table `user_id` column type.
 
@@ -446,7 +441,7 @@ Or join the [mailing list](http://groups.google.com/group/audited) to get help o
 In the spirit of [free software](http://www.fsf.org/licensing/essays/free-sw.html), **everyone** is encouraged to help improve this project. Here are a few ways _you_ can pitch in:
 
 * Use prerelease versions of Audited.
-* [Report bugs](https://github.com/collectiveidea/audited/issues).
-* Fix bugs and submit [pull requests](http://github.com/collectiveidea/audited/pulls).
+* [Report bugs](https://github.com/TangledWiresOfficial/audited/issues).
+* Fix bugs and submit [pull requests](http://github.com/TangledWiresOfficial/audited/pulls).
 * Write, clarify or fix documentation.
 * Refactor code.

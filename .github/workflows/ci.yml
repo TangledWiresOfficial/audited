@@ -12,9 +12,6 @@ jobs:
       matrix:
         ruby: ["2.3", "2.4", "2.5", "2.6", "2.7", "3.0", "3.1", "3.2", "3.3"]
         appraisal:
-          - rails52
-          - rails60
-          - rails61
           - rails70
           - rails71
           - rails72
@@ -31,40 +28,6 @@ jobs:
           # Doesn't seem worth solving.
           - ruby: "2.3"
             db: POSTGRES
-
-          # Rails 5.2 supports Ruby 2.2-2.5
-          - appraisal: rails52
-            ruby: "2.6"
-          - appraisal: rails52
-            ruby: "2.7"
-          - appraisal: rails52
-            ruby: "3.0"
-          - appraisal: rails52
-            ruby: "3.1"
-          - appraisal: rails52
-            ruby: "3.2"
-          - appraisal: rails52
-            ruby: "3.3"
-
-          # Rails 6.0 supports Ruby 2.5-2.7
-          - appraisal: rails60
-            ruby: "2.3"
-          - appraisal: rails60
-            ruby: "2.4"
-          - appraisal: rails60
-            ruby: "3.0"
-          - appraisal: rails60
-            ruby: "3.1"
-          - appraisal: rails60
-            ruby: "3.2"
-          - appraisal: rails60
-            ruby: "3.3"
-
-          # Rails 6.1 supports Ruby 2.5+
-          - appraisal: rails61
-            ruby: "2.3"
-          - appraisal: rails61
-            ruby: "2.4"
 
           # Rails 7 supports Ruby 2.7+
           - appraisal: rails70

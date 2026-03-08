@@ -1,15 +1,14 @@
 name: Publish Gem
 
 on:
-  push:
-    tags:
-      - v*
+  release:
+    types:
+      - published
 
 jobs:
   push:
-    if: github.repository == 'collectiveidea/audited'
+    if: github.repository == 'TangledWiresOfficial/audited'
     runs-on: ubuntu-latest
-    environment: publishing
 
     permissions:
       contents: write
@@ -18,6 +17,9 @@ jobs:
     steps:
       # Set up
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
