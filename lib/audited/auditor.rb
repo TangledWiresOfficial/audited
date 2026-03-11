@@ -91,6 +91,52 @@ module Audited
         after_touch :audit_touch if audited_options[:on].include?(:touch) && ::ActiveRecord::VERSION::MAJOR >= 6
         before_destroy :audit_destroy if audited_options[:on].include?(:destroy)
 
+        reflect_on_all_associations(:has_and_belongs_to_many).each do |reflection|
+          associated_model = reflection.name
+
+          # Attach callbacks to HABTM associations to create an audit when something is added or removed.
+          # after_add and after_remove are called only when the associated objects are added or removed through the association collection
+          add_callback_to_reflection reflection, :after_add, ->(owner, record) { owner.send("_pending_#{association}_audit")[:add] << record.id }
+          add_callback_to_reflection reflection, :after_remove, ->(owner, record) { owner.send("_pending_#{association}_audit")[:remove] << record.id }
+
+          # This is used so that only one audit is created even if multiple items are added/removed from the association.
+          # Since after_add and after_remove are fired *before* saving, we can build a list of things added and removed, then combine them into one audit *after* everything is saved.
+          define_method "_pending_#{associated_model}_audit" do
+            instance_variable_get("@_pending_#{associated_model}_audit") || instance_variable_set("@_pending_#{associated_model}_audit", { add: [], remove: [] })
+          end
+
+          # The following section creates audits when HABTM associations are modified in a way other than the association collection.
+          ids_method = "#{associated_model.to_s.singularize}_ids"
+          mod = Module.new do
+            define_method "#{ids_method}=" do |new_ids|
+              old_ids = send ids_method
+              super new_ids # Call original Rails setter
+
+              added = new_ids - old_ids
+              removed = old_ids - new_ids
+
+              send("_pending_#{associated_model}_audit")[:add].concat(added)
+              send("_pending_#{associated_model}_audit")[:remove].concat(removed)
+            end
+          end
+          prepend mod
+
+          after_save do
+            pending = send("_pending_#{associated_model}_audit")
+            next if pending[:add].empty? && pending[:remove].empty?
+
+            write_audit(
+              action: "update",
+              audited_changes: {
+                associated_model.to_s => pending.transform_values(&:uniq)
+              }
+            )
+
+            # Clear pending changes
+            instance_variable_set "@_pending_#{associated_model}_audit", { add: [], remove: [] }
+          end
+        end
+
         # Define and set after_audit and around_audit callbacks. This might be useful if you want
         # to notify a party after the audit has been created or if you want to access the newly-created
         # audit.
@@ -116,6 +162,15 @@ module Audited
         self.audited_options = options
         normalize_audited_options
         self.audit_associated_with = audited_options[:associated_with]
+      end
+
+      private
+      def add_callback_to_reflection(reflection, type, callback)
+        reflection.options[type] ||= []
+
+        unless reflection.options[type].include?(callback)
+          reflection.options[type] << callback
+        end
       end
     end
 
