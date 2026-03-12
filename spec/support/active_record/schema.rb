@@ -70,6 +70,21 @@ ActiveRecord::Schema.define do
     t.column :title, :string
   end
 
+  create_table :roles do |t|
+    t.column :name, :string
+  end
+
+  create_table :permissions do |t|
+    t.column :name, :string
+  end
+
+  create_table "permissions_roles", id: false do |t|
+    t.integer "permission_id"
+    t.integer "role_id"
+    t.index ["permission_id"], name: "index_permissions_roles_on_permission_id"
+    t.index ["role_id"], name: "index_permissions_roles_on_role_id"
+  end
+
   create_table :audits do |t|
     t.column :auditable_id, :integer
     t.column :auditable_type, :string

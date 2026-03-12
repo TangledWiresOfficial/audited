@@ -200,5 +200,15 @@ module Models
       self.table_name = "users"
       audited on: [:touch]
     end
+
+    class Role < ::ActiveRecord::Base
+      has_and_belongs_to_many :permissions
+      audited
+    end
+
+    class Permission < ::ActiveRecord::Base
+      has_and_belongs_to_many :roles
+      audited
+    end
   end
 end

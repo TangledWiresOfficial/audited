@@ -1291,4 +1291,59 @@ describe Audited::Auditor do
       expect(user.audits.last.audited_changes.keys).to eq(%w[password])
     end
   end
+
+  describe "HABTM auditing" do
+    Models::ActiveRecord::Role.reflect_on_all_associations(:has_and_belongs_to_many).each do |reflection|
+      context reflection.name do
+        it "should have after_add callback" do
+          expect(reflection.options[:after_add].length).to eq(1)
+        end
+
+        it "should have after_remove callback" do
+          expect(reflection.options[:after_remove].length).to eq(1)
+        end
+
+        it "tracks additions using #{reflection.name.to_s.singularize}_ids=" do
+          role = Models::ActiveRecord::Role.create! name: "Role 1" # 1st audit
+          permissions = [
+            Models::ActiveRecord::Permission.create!(name: "permission1"),
+            Models::ActiveRecord::Permission.create!(name: "permission2")
+          ]
+
+          role.permission_ids = permissions.map(&:id)
+
+          pending = role.send "_pending_#{reflection.name}_audit"
+          expect(pending[:add]).to contain_exactly(*permissions.map(&:id))
+
+          role.save! # 2nd audit
+          expect(role.audits.length).to eq(2)
+
+          pending = role.send "_pending_#{reflection.name}_audit"
+          expect(pending[:add]).to be_empty
+        end
+
+        it "tracks removals using #{reflection.name.to_s.singularize}_ids=" do
+          role = Models::ActiveRecord::Role.create! name: "Role 1" # 1st audit
+          permissions = [
+            Models::ActiveRecord::Permission.create!(name: "permission1"),
+            Models::ActiveRecord::Permission.create!(name: "permission2")
+          ]
+
+          role.permission_ids = permissions.map(&:id)
+          role.save! # 2nd audit
+
+          role.permission_ids = []
+
+          pending = role.send "_pending_#{reflection.name}_audit"
+          expect(pending[:remove]).to contain_exactly(*permissions.map(&:id))
+
+          role.save! # 3rd audit
+          expect(role.audits.length).to eq(3)
+
+          pending = role.send "_pending_#{reflection.name}_audit"
+          expect(pending[:remove]).to be_empty
+        end
+      end
+    end
+  end
 end
