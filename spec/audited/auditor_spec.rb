@@ -1346,4 +1346,14 @@ describe Audited::Auditor do
       end
     end
   end
+
+  describe "redact_after_destroy" do
+    it "redacts columns" do
+      user = Models::ActiveRecord::UserRedactAfterDestroy.create! name: "Test"
+
+      user.destroy!
+
+      expect(user.audits.last.audited_changes["name"]).to eq(Audited::Auditor::AuditedInstanceMethods::REDACTED)
+    end
+  end
 end

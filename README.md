@@ -6,11 +6,13 @@ TangledWires Audited
 
 **Audited** (previously acts_as_audited) is an ORM extension that logs all changes to your models. Audited can also record who made those changes, save comments and associate models related to the changes.
 
-Audited currently (5.6) works with Rails 8.0, 7.2, 7.1, 7.0.
+Audited currently (6.2) works with Rails 8.0, 7.2, 7.1, 7.0.
 
 ## Changes from `collectiveidea/audited`
 * Remove support for Rails versions below 7.0
 * Add support for auditing HABTM associations
+* Allow multiple associated audits ([collectiveidea/audited#406](https://github.com/collectiveidea/audited/pull/406))
+* Add an option to redact a record's audits when the record is deleted
 
 ## Supported Rubies
 

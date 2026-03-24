@@ -58,6 +58,13 @@ module Audited
       #       end
       #     end
       #
+      # * +redact_after_destroy+ - If an array is passed, the columns in the array
+      #   will be redacted from audits when the record is destroyed.
+      #
+      #     class User < ActiveRecord::Base
+      #       audited redact_after_destroy: [:name, :email, :address]
+      #     end
+      #
       def audited(options = {})
         audited? ? update_audited_options(options) : set_audit(options)
       end
@@ -90,6 +97,7 @@ module Audited
         before_update :audit_update if audited_options[:on].include?(:update)
         after_touch :audit_touch if audited_options[:on].include?(:touch) && ::ActiveRecord::VERSION::MAJOR >= 6
         before_destroy :audit_destroy if audited_options[:on].include?(:destroy)
+        after_destroy :redact_after_destroy unless audited_options[:redact_after_destroy].nil?
 
         reflect_on_all_associations(:has_and_belongs_to_many).each do |reflection|
           associated_model = reflection.name
@@ -427,6 +435,16 @@ module Audited
         unless new_record?
           write_audit(action: "destroy", audited_changes: audited_attributes,
             comment: audit_comment)
+        end
+      end
+
+      def redact_after_destroy
+        audits.each do |audit|
+          filter_attr_values(
+            audited_changes: audit.audited_changes,
+            attrs: Array(audited_options[:redact_after_destroy]).map(&:to_s),
+            placeholder: audited_options[:redaction_value] || REDACTED
+          )
         end
       end
 

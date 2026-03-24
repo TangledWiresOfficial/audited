@@ -71,6 +71,11 @@ module Models
       attr_readonly :status
     end
 
+    class UserRedactAfterDestroy < ::ActiveRecord::Base
+      self.table_name = :users
+      audited redact_after_destroy: [:name]
+    end
+
     class CommentRequiredUser < ::ActiveRecord::Base
       self.table_name = :users
       audited except: :password, comment_required: true
