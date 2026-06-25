@@ -1353,7 +1353,9 @@ describe Audited::Auditor do
 
       user.destroy!
 
-      expect(user.audits.last.audited_changes["name"]).to eq(Audited::Auditor::AuditedInstanceMethods::REDACTED)
+      Audited::Audit.where(auditable_type: "Models::ActiveRecord::UserRedactAfterDestroy", auditable_id: user.id).each do |audit|
+        expect(audit.audited_changes["name"]).to eq(Audited::Auditor::AuditedInstanceMethods::REDACTED)
+      end
     end
   end
 end

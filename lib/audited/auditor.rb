@@ -445,6 +445,7 @@ module Audited
             attrs: Array(audited_options[:redact_after_destroy]).map(&:to_s),
             placeholder: audited_options[:redaction_value] || REDACTED
           )
+          audit.save!
         end
       end
 
